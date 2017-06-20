@@ -22,8 +22,9 @@ AS
 		FROM sys.database_principals r
 			JOIN sys.database_principals o
 				ON o.principal_id = r.owning_principal_id
-		WHERE r.type = 'R'),
-	member_role AS (
+		--WHERE r.type = 'R'
+	)
+	,member_role AS (
 		SELECT
 			[member_principal_id]	= m.[principal_id]
 			,[member_name]			= m.[name]
@@ -40,7 +41,8 @@ AS
 										,''
 									)
 		FROM sys.database_principals m
-		WHERE m.[type] != 'R')
+		--WHERE m.[type] != 'R'
+	)
 	SELECT
 		[ObjectName]		= QUOTENAME(s.[name]) + '.' + QUOTENAME(o.[name])
 		,[Column]			= c.[name]	
