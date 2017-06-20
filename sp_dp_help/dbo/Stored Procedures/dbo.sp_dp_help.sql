@@ -30,8 +30,8 @@ DECLARE
 	,@BaseObjectName	NVARCHAR(1035)
 	,@Params			NVARCHAR(MAX)
 	,@Query				NVARCHAR(MAX)
-	,@grid_no			INT	= 0
-	,@grid_msg			VARCHAR(1000)
+	,@GridNo			INT	= 0
+	,@GridMsg			VARCHAR(1000)
 	,@tab_len			INT = 4
 --#endregion
 
@@ -57,17 +57,23 @@ IF @ServerName IS NOT NULL
 --#region Give some space usage info if object name not provided
 IF @ObjectName IS NULL
 BEGIN
-	SET @grid_no += 1;
-	SET @grid_msg = 'Grid ' + CONVERT(VARCHAR(10), @grid_no) + ': Space used by objects sorted by Reserved space descending.';
-	RAISERROR(@grid_msg, 10, 1) WITH NOWAIT;
+	SET @GridNo += 1;
+	SET @GridMsg = 'Space used by objects sorted by Reserved space descending.';
 
-	EXEC dbo.sp_dp_help_object_space_used;
+	EXEC [dbo].[sp_dp_help_print_grid_info]
+		@GridNo		= @GridNo
+		,@GridMsg	= @GridMsg;
 
-	SET @grid_no += 1;
-	SET @grid_msg = 'Grid ' + CONVERT(VARCHAR(10), @grid_no) + ': Database files info.';
-	RAISERROR(@grid_msg, 10, 1) WITH NOWAIT;
+	EXEC [dbo].[sp_dp_help_object_space_used];
 
-	EXEC dbo.sp_dp_help_database_files;
+	SET @GridNo += 1;
+	SET @GridMsg = 'Database files info.';
+
+	EXEC [dbo].[sp_dp_help_print_grid_info]
+		@GridNo		= @GridNo
+		,@GridMsg	= @GridMsg;
+
+	EXEC [dbo].[sp_dp_help_database_files];
 
 	RETURN(0);
 END
@@ -85,7 +91,7 @@ IF @DbName IS NULL
 IF @DbName != DB_NAME()
 BEGIN
 	SET @Query = '
-EXEC {DbName}.dbo.sp_dp_help
+EXEC [{DbName}].[dbo].[sp_dp_help]
 	 @ObjectNameIn	= @ObjectNameIn
 	,@Mode			= @Mode;';
 
@@ -106,7 +112,7 @@ END
 --#endregion
 
 --#region Get object id
-EXEC dbo.sp_dp_help_object_id
+EXEC [dbo].[sp_dp_help_get_object_id]
 	 @ObjectName		= @ObjectName		OUTPUT
 	,@SchemaName		= @SchemaName		OUTPUT
 	,@ObjectId			= @ObjectId			OUTPUT
@@ -118,11 +124,14 @@ EXEC dbo.sp_dp_help_object_id
 --#region Get dependencies up
 IF @Mode = 2
 BEGIN
-	SET @grid_no += 1;
-	SET @grid_msg = 'Grid ' + CONVERT(VARCHAR(10), @grid_no) + ': Dependencies of object or LIKE string.';
-	RAISERROR(@grid_msg, 10, 1) WITH NOWAIT;
+	SET @GridNo += 1;
+	SET @GridMsg = 'Dependencies of object or LIKE string.';
 
-	EXEC dbo.sp_dp_help_object_dependencies_up
+	EXEC [dbo].[sp_dp_help_print_grid_info]
+		@GridNo		= @GridNo
+		,@GridMsg	= @GridMsg;
+
+	EXEC [dbo].[sp_dp_help_object_dependencies_up]
 		 @ObjectId			= @ObjectId		
 		,@SchemaName		= @SchemaName	
 		,@ObjectName		= @ObjectName	
@@ -146,20 +155,26 @@ END
 --#region Get DATABASE info
 IF @ObjectType = 'DATABASE'
 BEGIN
-	SET @grid_no += 1;
-	SET @grid_msg = 'Grid ' + CONVERT(VARCHAR(10), @grid_no) + ': Database info.';
-	RAISERROR(@grid_msg, 10, 1) WITH NOWAIT;
+	SET @GridNo += 1;
+	SET @GridMsg = 'Database info.';
 
-	EXEC dbo.sp_dp_help_database
+	EXEC [dbo].[sp_dp_help_print_grid_info]
+		@GridNo		= @GridNo
+		,@GridMsg	= @GridMsg;
+
+	EXEC [dbo].[sp_dp_help_database]
 		@ObjectId = @ObjectId;
 
 	IF @Mode = 0
 	BEGIN
-		SET @grid_no += 1;
-		SET @grid_msg = 'Grid ' + CONVERT(VARCHAR(10), @grid_no) + ': Database files info.';
-		RAISERROR(@grid_msg, 10, 1) WITH NOWAIT;
+		SET @GridNo += 1;
+		SET @GridMsg = 'Database files info.';
 
-		EXEC dbo.sp_dp_help_database_files;
+		EXEC [dbo].[sp_dp_help_print_grid_info]
+			@GridNo		= @GridNo
+			,@GridMsg	= @GridMsg;
+
+		EXEC [dbo].[sp_dp_help_database_files];
 	END
 
 	RETURN(0);
@@ -169,22 +184,22 @@ END
 --#region Get SERVER PRINCIPAL info
 IF @ObjectType = 'SERVER PRINCIPAL'
 BEGIN
-	SET @grid_no += 1;
-	SET @grid_msg = 'Grid ' + CONVERT(VARCHAR(10), @grid_no) + ': Server principal info.';
-	RAISERROR(@grid_msg, 10, 1) WITH NOWAIT;
-	SET @grid_no += 1;
-	SET @grid_msg = 'Grid ' + CONVERT(VARCHAR(10), @grid_no) + ': Server role and member info.';
-	RAISERROR(@grid_msg, 10, 1) WITH NOWAIT;
+	SET @GridNo += 1;
+	SET @GridMsg = 'Server principal info.';
+
+	EXEC [dbo].[sp_dp_help_print_grid_info]
+		@GridNo		= @GridNo
+		,@GridMsg	= @GridMsg;
+
+	SET @GridNo += 1;
+	SET @GridMsg = 'Server role and member info.';
+
+	EXEC [dbo].[sp_dp_help_print_grid_info]
+		@GridNo		= @GridNo
+		,@GridMsg	= @GridMsg;
 	
-	EXEC dbo.sp_dp_help_server_principal
+	EXEC [dbo].[sp_dp_help_server_principal]
 		@ObjectId = @ObjectId;
-
-	--SET @grid_no += 1;
-	--SET @grid_msg = 'Grid ' + CONVERT(VARCHAR(10), @grid_no) + ': Object permisions info.';
-	--RAISERROR(@grid_msg, 10, 1) WITH NOWAIT;
-
-	--EXEC dbo.sp_dp_help_object_permissons
-	--	@ObjectId = @ObjectId;
 
 	RETURN(0);
 END
@@ -193,21 +208,35 @@ END
 --#region Get DATABASE PRINCIPAL info
 IF @ObjectType = 'DATABASE PRINCIPAL'
 BEGIN
-	SET @grid_no += 1;
-	SET @grid_msg = 'Grid ' + CONVERT(VARCHAR(10), @grid_no) + ': Database principal info.';
-	RAISERROR(@grid_msg, 10, 1) WITH NOWAIT;
-	SET @grid_no += 1;
-	SET @grid_msg = 'Grid ' + CONVERT(VARCHAR(10), @grid_no) + ': Database role and member info.';
-	RAISERROR(@grid_msg, 10, 1) WITH NOWAIT;
+	SET @GridNo += 1;
+	SET @GridMsg = 'Database principal info.';
+
+	EXEC [dbo].[sp_dp_help_print_grid_info]
+		@GridNo		= @GridNo
+		,@GridMsg	= @GridMsg;
+
+	SET @GridNo += 1;
+	SET @GridMsg = 'Database role and member info.';
+
+	EXEC [dbo].[sp_dp_help_print_grid_info]
+		@GridNo		= @GridNo
+		,@GridMsg	= @GridMsg;
 	
-	EXEC dbo.sp_dp_help_database_principal
+	EXEC [dbo].[sp_dp_help_database_principal]
 		@ObjectId = @ObjectId;
 
-	SET @grid_no += 1;
-	SET @grid_msg = 'Grid ' + CONVERT(VARCHAR(10), @grid_no) + ': Object permisions info.';
-	RAISERROR(@grid_msg, 10, 1) WITH NOWAIT;
+	SET @GridNo += 1;
+	SET @GridMsg = 'Grid ' + CONVERT(VARCHAR(10), @GridNo) + ': Object permisions info.';
+	RAISERROR(@GridMsg, 10, 1) WITH NOWAIT;
 
-	EXEC dbo.sp_dp_help_object_permissons
+	SET @GridNo += 1;
+	SET @GridMsg = 'Object permisions info.';
+
+	EXEC [dbo].[sp_dp_help_print_grid_info]
+		@GridNo		= @GridNo
+		,@GridMsg	= @GridMsg;
+
+	EXEC [dbo].[sp_dp_help_object_permissons]
 		@ObjectId = @ObjectId;
 
 	RETURN(0);
@@ -217,11 +246,14 @@ END
 --#region Get SCHEMA info
 IF @ObjectType = 'SCHEMA'
 BEGIN
-	SET @grid_no += 1;
-	SET @grid_msg = 'Grid ' + CONVERT(VARCHAR(10), @grid_no) + ': Schema info.';
-	RAISERROR(@grid_msg, 10, 1) WITH NOWAIT;
+	SET @GridNo += 1;
+	SET @GridMsg = 'Schema info.';
 
-	EXEC dbo.sp_dp_help_schema
+	EXEC [dbo].[sp_dp_help_print_grid_info]
+		@GridNo		= @GridNo
+		,@GridMsg	= @GridMsg;
+
+	EXEC [dbo].[sp_dp_help_schema]
 		@ObjectId = @ObjectId;
 
 	RETURN(0);
@@ -231,11 +263,14 @@ END
 --#region Get ASSEMBLY info
 IF @ObjectType = 'ASSEMBLY'
 BEGIN
-	SET @grid_no += 1;
-	SET @grid_msg = 'Grid ' + CONVERT(VARCHAR(10), @grid_no) + ': Assembly info.';
-	RAISERROR(@grid_msg, 10, 1) WITH NOWAIT;
+	SET @GridNo += 1;
+	SET @GridMsg = 'Assembly info.';
 
-	EXEC dbo.sp_dp_help_assembly
+	EXEC [dbo].[sp_dp_help_print_grid_info]
+		@GridNo		= @GridNo
+		,@GridMsg	= @GridMsg;
+
+	EXEC [dbo].[sp_dp_help_assembly]
 		@ObjectId = @ObjectId;
 
 	RETURN(0);
@@ -245,17 +280,20 @@ END
 --#region Get TYPE info
 IF @ObjectType = 'TYPE'
 BEGIN
-	SET @grid_no += 1;
-	SET @grid_msg = 'Grid ' + CONVERT(VARCHAR(10), @grid_no) + ': User type info.';
-	RAISERROR(@grid_msg, 10, 1) WITH NOWAIT;
+	SET @GridNo += 1;
+	SET @GridMsg = 'User type info.';
 
-	EXEC dbo.sp_dp_help_type
+	EXEC [dbo].[sp_dp_help_print_grid_info]
+		@GridNo		= @GridNo
+		,@GridMsg	= @GridMsg;
+
+	EXEC [dbo].[sp_dp_help_type]
 		@ObjectId = @ObjectId;
 	
 	IF EXISTS (
 	   	SELECT 1
 		FROM sys.table_types
-		WHERE user_type_id = @ObjectId)
+		WHERE [user_type_id] = @ObjectId)
 			AND @Mode = 0
 		SELECT
 			@ColumnsObjectId = [type_table_object_id]
@@ -269,11 +307,14 @@ END
 --#region Get DATABASE TRIGGER info
 IF @ObjectType = 'DDL TRIGGER'
 BEGIN
-	SET @grid_no += 1;
-	SET @grid_msg = 'Grid ' + CONVERT(VARCHAR(10), @grid_no) + ': DDL Trigger info.';
-	RAISERROR(@grid_msg, 10, 1) WITH NOWAIT;
+	SET @GridNo += 1;
+	SET @GridMsg = 'DDL Trigger info.';
 
-	EXEC dbo.sp_dp_help_database_trigger
+	EXEC [dbo].[sp_dp_help_print_grid_info]
+		@GridNo		= @GridNo
+		,@GridMsg	= @GridMsg;
+
+	EXEC [dbo].[sp_dp_help_database_trigger]
 		@ObjectId		= @ObjectId
 		,@SchemaName	= @SchemaName;
 
@@ -284,11 +325,14 @@ END
 --#region Get XML SCHEMA COLLECTION info
 IF @ObjectType = 'XML SCHEMA COLLECTION'
 BEGIN
-	SET @grid_no += 1;
-	SET @grid_msg = 'Grid ' + CONVERT(VARCHAR(10), @grid_no) + ': XML Schema Collection info.';
-	RAISERROR(@grid_msg, 10, 1) WITH NOWAIT;
+	SET @GridNo += 1;
+	SET @GridMsg = 'XML Schema Collection info.';
 
-	EXEC dbo.sp_dp_help_xml_schema_collection
+	EXEC [dbo].[sp_dp_help_print_grid_info]
+		@GridNo		= @GridNo
+		,@GridMsg	= @GridMsg;
+
+	EXEC [dbo].[sp_dp_help_xml_schema_collection]
 		@ObjectId		= @ObjectId;
 
 	RETURN(0);
@@ -299,9 +343,9 @@ END
 IF @ObjectType = 'SN'
 BEGIN
 	SELECT
-		@BaseObjectName = base_object_name
+		@BaseObjectName = [base_object_name]
 	FROM sys.synonyms
-	WHERE object_id = @ObjectId;
+	WHERE [object_id] = @ObjectId;
 END
 --#endregion
 
@@ -315,9 +359,12 @@ IF EXISTS (
 		WHERE [object_id] = @ObjectId
 	)
 BEGIN	
-	SET @grid_no += 1;
-	SET @grid_msg = 'Grid ' + CONVERT(VARCHAR(10), @grid_no) + ': Object info.';
-	RAISERROR(@grid_msg, 10, 1) WITH NOWAIT;
+	SET @GridNo += 1;
+	SET @GridMsg = 'Object info.';
+
+	EXEC [dbo].[sp_dp_help_print_grid_info]
+		@GridNo		= @GridNo
+		,@GridMsg	= @GridMsg;
 
 	EXEC dbo.sp_dp_help_object
 		 @ObjectId			= @ObjectId		
@@ -344,7 +391,7 @@ BEGIN
 	END
 
 	SET @Query = '
-EXEC {DbName}.dbo.sp_dp_help
+EXEC [{DbName}].[dbo].[sp_dp_help]
 	 @ObjectNameIn	= @ObjectNameIn;';
 
 	SET @Params = '
@@ -368,9 +415,12 @@ IF EXISTS (
 	WHERE [object_id] = @ObjectId)
 	AND @Mode = 0
 BEGIN
-	SET @grid_no += 1;
-	SET @grid_msg = 'Grid ' + CONVERT(VARCHAR(10), @grid_no) + ': Object parameters info.';
-	RAISERROR(@grid_msg, 10, 1) WITH NOWAIT;
+	SET @GridNo += 1;
+	SET @GridMsg = 'Object parameters info.';
+
+	EXEC [dbo].[sp_dp_help_print_grid_info]
+		@GridNo		= @GridNo
+		,@GridMsg	= @GridMsg;
 
 	EXEC dbo.sp_dp_help_object_parameters
 		@ObjectId		= @ObjectId
@@ -385,11 +435,14 @@ IF EXISTS (
 	WHERE [object_id] = @ColumnsObjectId)
 	AND @Mode = 0
 BEGIN
-	SET @grid_no += 1;
-	SET @grid_msg = 'Grid ' + CONVERT(VARCHAR(10), @grid_no) + ': Object columns info.';
-	RAISERROR(@grid_msg, 10, 1) WITH NOWAIT;
+	SET @GridNo += 1;
+	SET @GridMsg = 'Object columns info.';
 
-	EXEC dbo.sp_dp_help_object_columns
+	EXEC [dbo].[sp_dp_help_print_grid_info]
+		@GridNo		= @GridNo
+		,@GridMsg	= @GridMsg;
+
+	EXEC [dbo].[sp_dp_help_object_columns]
 		@ObjectId		= @ObjectId
 		,@tab_len		= @tab_len;
 END
@@ -402,11 +455,14 @@ IF EXISTS (
 	WHERE [object_id] = @ObjectId
 	)
 BEGIN
-	SET @grid_no += 1;
-	SET @grid_msg = 'Grid ' + CONVERT(VARCHAR(10), @grid_no) + ': Object indexes info.';
-	RAISERROR(@grid_msg, 10, 1) WITH NOWAIT;
+	SET @GridNo += 1;
+	SET @GridMsg = 'Object indexes info.';
 
-	EXEC dbo.sp_dp_help_object_indexes
+	EXEC [dbo].[sp_dp_help_print_grid_info]
+		@GridNo		= @GridNo
+		,@GridMsg	= @GridMsg;
+
+	EXEC [dbo].[sp_dp_help_object_indexes]
 		@ObjectId		= @ObjectId
 		,@SchemaName	= @SchemaName
 		,@ObjectName	= @ObjectName;		
@@ -420,11 +476,14 @@ IF EXISTS (
 	WHERE parent_id = @ObjectId
 )
 BEGIN
-	SET @grid_no += 1;
-	SET @grid_msg = 'Grid ' + CONVERT(VARCHAR(10), @grid_no) + ': Object triggers info.';
-	RAISERROR(@grid_msg, 10, 1) WITH NOWAIT;
+	SET @GridNo += 1;
+	SET @GridMsg = 'Object triggers info.';
 
-	EXEC dbo.sp_dp_help_object_triggers
+	EXEC [dbo].[sp_dp_help_print_grid_info]
+		@GridNo		= @GridNo
+		,@GridMsg	= @GridMsg;
+
+	EXEC [dbo].[sp_dp_help_object_triggers]
 		@ObjectId		= @ObjectId;
 END
 --#endregion
@@ -436,11 +495,14 @@ IF EXISTS (
 	WHERE parent_object_id = @ObjectId
 		AND type NOT IN ('TR', 'IT'))
 BEGIN
-	SET @grid_no += 1;
-	SET @grid_msg = 'Grid ' + CONVERT(VARCHAR(10), @grid_no) + ': Object constraints info.';
-	RAISERROR(@grid_msg, 10, 1) WITH NOWAIT;
+	SET @GridNo += 1;
+	SET @GridMsg = 'Object constraints info.';
 
-	EXEC dbo.sp_dp_help_object_constraints
+	EXEC [dbo].[sp_dp_help_print_grid_info]
+		@GridNo		= @GridNo
+		,@GridMsg	= @GridMsg;
+
+	EXEC [dbo].[sp_dp_help_object_constraints]
 		@ObjectId = @ObjectId;
 END
 --#endregion
@@ -451,11 +513,14 @@ IF EXISTS (
 	FROM sys.foreign_keys
 	WHERE referenced_object_id = @ObjectId)
 BEGIN
-	SET @grid_no += 1;
-	SET @grid_msg = 'Grid ' + CONVERT(VARCHAR(10), @grid_no) + ': Object referenced by foreign keys info.';
-	RAISERROR(@grid_msg, 10, 1) WITH NOWAIT;
+	SET @GridNo += 1;
+	SET @GridMsg = 'Object referenced by foreign keys info.';
 
-	EXEC dbo.sp_dp_help_object_referenced_by_fk
+	EXEC [dbo].[sp_dp_help_print_grid_info]
+		@GridNo		= @GridNo
+		,@GridMsg	= @GridMsg;
+
+	EXEC [dbo].[sp_dp_help_object_referenced_by_fk]
 		@ObjectId = @ObjectId;
 END
 --#endregion
@@ -471,13 +536,17 @@ IF EXISTS (
 	WHERE p.[class] >= 1
 		AND p.[major_id] = @ObjectId)
 BEGIN
-	SET @grid_no += 1;
-	SET @grid_msg = 'Grid ' + CONVERT(VARCHAR(10), @grid_no) + ': Object permisions info.';
-	RAISERROR(@grid_msg, 10, 1) WITH NOWAIT;
+	SET @GridNo += 1;
+	SET @GridMsg = 'Object permisions info.';
 
-	EXEC dbo.sp_dp_help_object_permissons
+	EXEC [dbo].[sp_dp_help_print_grid_info]
+		@GridNo		= @GridNo
+		,@GridMsg	= @GridMsg;
+
+	EXEC [dbo].[sp_dp_help_object_permissons]
 		@ObjectId = @ObjectId;
 END
 --#endregion
-GO
 
+RETURN(0);
+GO

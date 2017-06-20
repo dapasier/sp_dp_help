@@ -1,4 +1,4 @@
-CREATE PROC dbo.sp_dp_help_object_id
+CREATE PROC dbo.sp_dp_help_get_object_id
 	@ObjectName			SYSNAME			OUTPUT
 	,@SchemaName		SYSNAME			OUTPUT
 	,@ObjectId			INT				OUTPUT

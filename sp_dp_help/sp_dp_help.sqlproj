@@ -8,7 +8,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectVersion>4.1</ProjectVersion>
     <ProjectGuid>{fbcec440-901c-4bf3-82ca-24e4a1c91ea7}</ProjectGuid>
-    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql130DatabaseSchemaProvider</DSP>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql100DatabaseSchemaProvider</DSP>
     <OutputType>Database</OutputType>
     <RootPath>
     </RootPath>
@@ -65,6 +65,7 @@
   <ItemGroup>
     <Build Include="dbo\Functions\dbo.FormatNumeric.sql" />
     <Build Include="dbo\Stored Procedures\dbo.sp_dp_help.sql" />
+    <Build Include="dbo\Stored Procedures\sp_dp_help_print_grid_info.sql" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Stored Procedures\dbo.sp_dp_help_assembly.sql" />
@@ -76,7 +77,7 @@
     <Build Include="dbo\Stored Procedures\dbo.sp_dp_help_object_columns.sql" />
     <Build Include="dbo\Stored Procedures\dbo.sp_dp_help_object_constraints.sql" />
     <Build Include="dbo\Stored Procedures\dbo.sp_dp_help_object_dependencies_up.sql" />
-    <Build Include="dbo\Stored Procedures\dbo.sp_dp_help_object_id.sql" />
+    <Build Include="dbo\Stored Procedures\dbo.sp_dp_help_get_object_id.sql" />
     <Build Include="dbo\Stored Procedures\dbo.sp_dp_help_object_indexes.sql" />
     <Build Include="dbo\Stored Procedures\dbo.sp_dp_help_object_parameters.sql" />
     <Build Include="dbo\Stored Procedures\dbo.sp_dp_help_object_permissions.sql" />
@@ -102,5 +103,8 @@
       <SuppressMissingDependenciesErrors>False</SuppressMissingDependenciesErrors>
       <DatabaseVariableLiteralValue>msdb</DatabaseVariableLiteralValue>
     </ArtifactReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PreDeploy Include="Scripts\Script.PreDeployment1.sql" />
   </ItemGroup>
 </Project>
