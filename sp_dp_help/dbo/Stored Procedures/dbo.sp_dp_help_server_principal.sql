@@ -12,49 +12,28 @@ AS
 	WHERE [principal_id] = @ObjectId
 	ORDER BY [PrincipalName];
 
-	IF EXISTS (
-	   	SELECT 1
-	   	FROM sys.server_principals p
-			JOIN sys.server_role_members rm
-				ON rm.[role_principal_id] = p.[principal_id]
-		WHERE [principal_id] = @ObjectId
-	)
-	BEGIN
-		SELECT	
-			[RoleName]		= p.[name]
-			,[MemberName]	= m.[name]
-		FROM sys.server_principals p
-			JOIN sys.server_role_members rm
-				ON rm.[role_principal_id] = p.[principal_id]
-			JOIN sys.server_principals m
-				ON m.[principal_id] = rm.[member_principal_id]
-		WHERE p.[principal_id] = @ObjectId
-		ORDER BY [RoleName], [MemberName];
-	END
-	ELSE
-	IF EXISTS (
-	   	SELECT 1
-	   	FROM sys.server_principals p
-			JOIN sys.server_role_members rm
-				ON rm.[member_principal_id] = p.[principal_id]
-		WHERE principal_id = @ObjectId
-	)
-	BEGIN
-		SELECT	
-			[RoleName]		= p.[name]
-			,[MemberName]	= m.[name]
-		FROM sys.server_principals p
-			JOIN sys.server_role_members rm
-				ON rm.[role_principal_id] = p.[principal_id]
-			JOIN sys.server_principals m
-				ON m.[principal_id] = rm.[member_principal_id]
-		WHERE m.[principal_id] = @ObjectId	
-		ORDER BY [RoleName], [MemberName];
-	END
-	ELSE
-		SELECT TOP(0)
-			[RoleName]		= ''
-			,[MemberName]	= ''
+	SELECT	
+		[RoleName]		= p.[name]
+		,[MemberName]	= m.[name]
+	FROM sys.server_principals p
+		JOIN sys.server_role_members rm
+			ON rm.[role_principal_id] = p.[principal_id]
+		JOIN sys.server_principals m
+			ON m.[principal_id] = rm.[member_principal_id]
+	WHERE p.[principal_id] = @ObjectId
+	
+	UNION ALL
+
+	SELECT	
+		[RoleName]		= p.[name]
+		,[MemberName]	= m.[name]
+	FROM sys.server_principals p
+		JOIN sys.server_role_members rm
+			ON rm.[role_principal_id] = p.[principal_id]
+		JOIN sys.server_principals m
+			ON m.[principal_id] = rm.[member_principal_id]
+	WHERE m.[principal_id] = @ObjectId	
+	ORDER BY [RoleName], [MemberName];
 
 	SELECT
 		[Class]			= p.[class_desc]
