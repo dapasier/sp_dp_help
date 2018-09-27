@@ -63,31 +63,31 @@
     <Folder Include="Scripts" />
   </ItemGroup>
   <ItemGroup>
-    <Build Include="dbo\Functions\dbo.FormatNumeric.sql" />
-    <Build Include="dbo\Stored Procedures\dbo.sp_dp_help.sql" />
+    <Build Include="dbo\Functions\FormatNumeric.sql" />
+    <Build Include="dbo\Stored Procedures\sp_dp_help.sql" />
     <Build Include="dbo\Stored Procedures\sp_dp_help_print_grid_info.sql" />
   </ItemGroup>
   <ItemGroup>
-    <Build Include="dbo\Stored Procedures\dbo.sp_dp_help_assembly.sql" />
-    <Build Include="dbo\Stored Procedures\dbo.sp_dp_help_database.sql" />
-    <Build Include="dbo\Stored Procedures\dbo.sp_dp_help_database_files.sql" />
-    <Build Include="dbo\Stored Procedures\dbo.sp_dp_help_database_principal.sql" />
-    <Build Include="dbo\Stored Procedures\dbo.sp_dp_help_database_trigger.sql" />
-    <Build Include="dbo\Stored Procedures\dbo.sp_dp_help_object.sql" />
-    <Build Include="dbo\Stored Procedures\dbo.sp_dp_help_object_columns.sql" />
-    <Build Include="dbo\Stored Procedures\dbo.sp_dp_help_object_constraints.sql" />
-    <Build Include="dbo\Stored Procedures\dbo.sp_dp_help_object_dependencies_up.sql" />
-    <Build Include="dbo\Stored Procedures\dbo.sp_dp_help_get_object_id.sql" />
-    <Build Include="dbo\Stored Procedures\dbo.sp_dp_help_object_indexes.sql" />
-    <Build Include="dbo\Stored Procedures\dbo.sp_dp_help_object_parameters.sql" />
-    <Build Include="dbo\Stored Procedures\dbo.sp_dp_help_object_permissions.sql" />
-    <Build Include="dbo\Stored Procedures\dbo.sp_dp_help_object_referenced_by_fk.sql" />
-    <Build Include="dbo\Stored Procedures\dbo.sp_dp_help_object_space_used.sql" />
-    <Build Include="dbo\Stored Procedures\dbo.sp_dp_help_object_triggers.sql" />
-    <Build Include="dbo\Stored Procedures\dbo.sp_dp_help_schema.sql" />
-    <Build Include="dbo\Stored Procedures\dbo.sp_dp_help_server_principal.sql" />
-    <Build Include="dbo\Stored Procedures\dbo.sp_dp_help_type.sql" />
-    <Build Include="dbo\Stored Procedures\dbo.sp_dp_help_xml_schema_collection.sql" />
+    <Build Include="dbo\Stored Procedures\sp_dp_help_assembly.sql" />
+    <Build Include="dbo\Stored Procedures\sp_dp_help_database.sql" />
+    <Build Include="dbo\Stored Procedures\sp_dp_help_database_files.sql" />
+    <Build Include="dbo\Stored Procedures\sp_dp_help_database_principal.sql" />
+    <Build Include="dbo\Stored Procedures\sp_dp_help_database_trigger.sql" />
+    <Build Include="dbo\Stored Procedures\sp_dp_help_object.sql" />
+    <Build Include="dbo\Stored Procedures\sp_dp_help_object_columns.sql" />
+    <Build Include="dbo\Stored Procedures\sp_dp_help_object_constraints.sql" />
+    <Build Include="dbo\Stored Procedures\sp_dp_help_object_dependencies_up.sql" />
+    <Build Include="dbo\Stored Procedures\sp_dp_help_get_object_id.sql" />
+    <Build Include="dbo\Stored Procedures\sp_dp_help_object_indexes.sql" />
+    <Build Include="dbo\Stored Procedures\sp_dp_help_object_parameters.sql" />
+    <Build Include="dbo\Stored Procedures\sp_dp_help_object_permissions.sql" />
+    <Build Include="dbo\Stored Procedures\sp_dp_help_object_referenced_by_fk.sql" />
+    <Build Include="dbo\Stored Procedures\sp_dp_help_object_space_used.sql" />
+    <Build Include="dbo\Stored Procedures\sp_dp_help_object_triggers.sql" />
+    <Build Include="dbo\Stored Procedures\sp_dp_help_schema.sql" />
+    <Build Include="dbo\Stored Procedures\sp_dp_help_server_principal.sql" />
+    <Build Include="dbo\Stored Procedures\sp_dp_help_type.sql" />
+    <Build Include="dbo\Stored Procedures\sp_dp_help_xml_schema_collection.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Script.PostDeployment1.sql" />
