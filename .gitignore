@@ -240,3 +240,6 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
+
+.jfm
+/sp_dp_help/sp_dp_help.jfm
