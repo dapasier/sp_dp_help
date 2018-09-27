@@ -80,6 +80,7 @@ BEGIN
 			,[SchemaName]	= NULL
 		FROM sys.server_principals p
 		WHERE p.[name] = @ObjectName
+			AND DB_NAME() = 'master'
 		UNION ALL
 		SELECT
 			 [ObjectId]		= p.[principal_id]
@@ -88,13 +89,15 @@ BEGIN
 			,[SchemaName]	= NULL
 		FROM sys.database_principals p
 		WHERE p.[name] = @ObjectName
-			AND NOT EXISTS (
-				SELECT 1
-				FROM sys.all_objects o
-					JOIN sys.schemas s
-						ON s.[principal_id] = o.[schema_id]
-				WHERE s.[name] = p.[default_schema_name]
-			)
+			AND DB_NAME() != 'master'
+			-- Nie pamiêtam po co to by³o...
+			--AND NOT EXISTS (
+			--	SELECT 1
+			--	FROM sys.all_objects o
+			--		JOIN sys.schemas s
+			--			ON s.[principal_id] = o.[schema_id]
+			--	WHERE s.[name] = p.[default_schema_name]
+			--)
 		UNION ALL
 		SELECT
 			 [ObjectId]		= [schema_id]
