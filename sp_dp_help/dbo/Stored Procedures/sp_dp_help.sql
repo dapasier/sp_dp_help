@@ -7,12 +7,12 @@ CREATE PROC dbo.sp_dp_help
 	,@ObjectTypeIn	SYSNAME			= NULL
 AS
 --TODO:
---obs³uga Check Constraint
---poprawiæ obs³ugê pobierania opisu dla TT
---wyci¹ganie Rev z tekstu
+--obsługa Check Constraint
+--poprawić obsługę pobierania opisu dla TT
+--wyciąganie Rev z tekstu
 --skryptowanie constraintów
---dodaæ skryptowanie outputu procedury do tabeli tymczasowej
---listê uprawnien dla roli/u¿ytkownika
+--dodać skryptowanie outputu procedury do tabeli tymczasowej
+--listę uprawnien dla roli/użytkownika
 SET NOCOUNT ON;
 SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
 
