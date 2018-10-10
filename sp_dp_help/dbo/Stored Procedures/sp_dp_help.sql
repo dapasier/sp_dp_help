@@ -91,7 +91,7 @@ IF @DbName IS NULL
 IF @DbName != DB_NAME()
 BEGIN
 	SET @Query = '
-EXEC [{DbName}].[dbo].[sp_dp_help]
+EXEC {DbName}.[dbo].[sp_dp_help]
 	 @ObjectNameIn	= @ObjectNameIn
 	,@Mode			= @Mode;';
 
