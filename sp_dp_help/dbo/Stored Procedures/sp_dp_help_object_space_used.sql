@@ -21,23 +21,19 @@ AS
 									ELSE 0  
 								END
 							)
-			,[FileGroup]	= f.[name]
 		FROM sys.dm_db_partition_stats ps
 			JOIN sys.objects o
-				ON o.[object_id] = ps.[object_id]
+				ON o.object_id = ps.object_id
 			JOIN sys.schemas s
-				ON o.[schema_id] = s.[schema_id]
+				ON o.schema_id = s.schema_id
 			JOIN sys.indexes i
-				ON i.[object_id] = o.[object_id]
-				AND i.[index_id] = ps.[index_id]
-			JOIN sys.filegroups f
-				ON f.[data_space_id] = i.[data_space_id]
+				ON i.object_id = o.object_id
+				AND i.index_id = ps.index_id
 		WHERE o.object_id = ISNULL(@ObjectId, o.object_id)
 		GROUP BY 
 			s.[name]
 			,o.[name]
 			,o.[type_desc]
-			,f.[name]
 	)
 	SELECT
 		a.[ObjectName]
@@ -47,7 +43,6 @@ AS
 		,[Indexes (MB)]		= master.dbo.FormatNumeric(a.[Used] - a.[Data], 2, default, default, default, 12)
 		,[Unused (MB)]		= master.dbo.FormatNumeric(a.[Reserved] - a.[Used], 2, default, default, default, 12)
 		,[Rowcount]			= master.dbo.FormatNumeric(a.[Rowcount], 0, default, default, default, 12)
-		,a.[FileGroup]
 	FROM aggr a
 	ORDER BY [Reserved] DESC;
 GO

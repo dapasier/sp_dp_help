@@ -6,6 +6,23 @@ AS
 	DECLARE
 		 @crlf	CHAR(2)	 = CHAR(13) + CHAR(10);
 
+	;WITH
+	partitions_info AS (
+		SELECT
+			p.object_id
+			,p.index_id
+			,[allocation_type]	= au.type_desc
+			,[rows]				= SUM(p.rows)
+			,[used_pages]		= SUM(au.used_pages)
+			,[partitions_count]	= COUNT(p.partition_number)
+		FROM sys.partitions p
+		LEFT JOIN sys.allocation_units au
+			ON au.container_id = p.partition_id
+		WHERE p.object_id = @ObjectId
+		GROUP BY p.object_id
+			,p.index_id
+			,au.type_desc
+	)
 	SELECT
 		 [IndexName]		= i.name
 		,[IndexType]		= 
@@ -44,10 +61,9 @@ AS
 									ORDER BY ic1.key_ordinal
 									FOR XML PATH(''), TYPE).value('.', 'nvarchar(max)'), 1, 1, '')
 		,[Filter]			= i.filter_definition
-		,[AllocationType]	= au.type_desc
-		,[Space (MB)]		= master.dbo.FormatNumeric((au.used_pages * 8) / 1024., 2, default, default, default, 12)
-		,[Space (%)]		= CAST((au.used_pages * 1.) / NULLIF(SUM(au.used_pages) OVER(PARTITION BY o.name), 0) * 100 as decimal(19,2))
-		--,[Unused (MB)]		= master.dbo.FormatNumeric(((au.total_pages - au.used_pages) * 8) / 1024., 2, default, default, default, 12)
+		,[AllocationType]	= p.allocation_type
+		,[Space (MB)]		= master.dbo.FormatNumeric((p.used_pages * 8) / 1024., 2, default, default, default, 12)
+		,[Space (%)]		= CAST((p.used_pages * 1.) / NULLIF(SUM(p.used_pages) OVER(PARTITION BY o.name), 0) * 100 as decimal(19,2))
 		,[Rowcount]			= master.dbo.FormatNumeric(p.[rows], 0, default, default, default, 12)
 		,[IsDisabled]		= i.is_disabled
 		,[FillFactor]		= i.fill_factor
@@ -57,6 +73,7 @@ AS
 		,[LastUserSeek]		= s.last_user_seek
 		,[LastUserScan]		= s.last_user_scan
 		,[LastUserLookup]	= s.last_user_lookup
+		,[PartitionsCount]	= p.partitions_count
 		,[Script]			= CASE i.is_primary_key
 									WHEN 1 THEN
 										'ALTER TABLE ' + QUOTENAME(@SchemaName) + '.' + QUOTENAME(@ObjectName) +
@@ -131,11 +148,9 @@ AS
 			ON s.database_id = DB_ID()
 				AND i.object_id = s.object_id
 				AND i.index_id = s.index_id
-		LEFT JOIN sys.partitions p
+		LEFT JOIN partitions_info p
 			ON i.object_id = p.object_id
 				AND i.index_id = p.index_id
-		LEFT JOIN sys.allocation_units au
-			ON au.container_id = p.partition_id
 	WHERE o.[object_id] = @ObjectId
 	ORDER BY [Space (MB)] DESC, [IndexName];
 GO
