@@ -443,7 +443,7 @@ BEGIN
 		,@GridMsg	= @GridMsg;
 
 	EXEC [dbo].[sp_dp_help_object_columns]
-		@ObjectId		= @ObjectId
+		@ObjectId		= @ColumnsObjectId
 		,@tab_len		= @tab_len;
 END
 --#endregion
