@@ -391,7 +391,7 @@ BEGIN
 	END
 
 	SET @Query = '
-EXEC [{DbName}].[dbo].[sp_dp_help]
+EXEC {DbName}.[dbo].[sp_dp_help]
 	 @ObjectNameIn	= @ObjectNameIn;';
 
 	SET @Params = '

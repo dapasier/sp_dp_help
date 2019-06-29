@@ -74,6 +74,7 @@ AS
 		,[LastUserScan]		= s.last_user_scan
 		,[LastUserLookup]	= s.last_user_lookup
 		,[PartitionsCount]	= p.partitions_count
+		,[FileGroup]		= fg.name
 		,[Script]			= CASE i.is_primary_key
 									WHEN 1 THEN
 										'ALTER TABLE ' + QUOTENAME(@SchemaName) + '.' + QUOTENAME(@ObjectName) +
@@ -151,6 +152,8 @@ AS
 		LEFT JOIN partitions_info p
 			ON i.object_id = p.object_id
 				AND i.index_id = p.index_id
+		LEFT JOIN sys.filegroups fg
+			ON i.data_space_id = fg.data_space_id
 	WHERE o.[object_id] = @ObjectId
 	ORDER BY [Space (MB)] DESC, [IndexName];
 GO
