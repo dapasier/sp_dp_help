@@ -3,6 +3,9 @@ AS
 DECLARE
 	@DatabaseId	INT = DB_ID();
 
+EXEC [dbo].[sp_dp_help_print_grid_info]
+	@GridMsg	= 'Database files';
+
 SELECT
 	[LogicalFileName]	= s.[name]
 	,[FileName]			= s.[physical_name]

@@ -7,7 +7,7 @@ CREATE PROC dbo.sp_dp_help_get_object_id
 	,@ObjectNameFull	NVARCHAR(392)	OUTPUT
 AS
 --#region Create #objects
-CREATE TABLE #objects
+CREATE TABLE #sp_dp_help_objects
 (
      [ObjectId]			INT NOT NULL
 	,[ObjectName]		SYSNAME NOT NULL
@@ -18,7 +18,7 @@ CREATE TABLE #objects
 --#endregion
 
 --#region Get standard id from sys.all_objects
-INSERT INTO #objects (
+INSERT INTO #sp_dp_help_objects (
 	[ObjectId]
 	,[ObjectName]
 	,[ObjectType]
@@ -44,7 +44,7 @@ BEGIN
 		,ObjectType
 		,ObjectTypeDesc
 		,SchemaName
-	FROM #objects
+	FROM #sp_dp_help_objects
 	ORDER BY ObjectName;
 
 	RAISERROR('Ambiguous object name, please refine schema.', 16, 1);
@@ -57,7 +57,7 @@ SELECT
 	,@ObjectType		= ObjectType
 	,@ObjectTypeDesc	= ObjectTypeDesc
 	,@SchemaName		= SchemaName
-FROM #objects;
+FROM #sp_dp_help_objects;
 --#endregion
 
 --#region Get non standard object id
@@ -155,7 +155,7 @@ BEGIN
 			AND s.[name] = ISNULL(@SchemaName, s.[name])
 			AND x.[xml_collection_id] > 1		
 		)
-	INSERT INTO #objects (
+	INSERT INTO #sp_dp_help_objects (
 		[ObjectId]
 		,[ObjectName]
 		,[ObjectType]
@@ -182,7 +182,7 @@ BEGIN
 			,[ObjectType]
 			,[ObjectTypeDesc]
 			,[SchemaName]
-		FROM #objects
+		FROM #sp_dp_help_objects
 		ORDER BY [ObjectName];
 
 		RAISERROR('Ambiguous object name, please refine schema.', 16, 1);
@@ -195,7 +195,7 @@ BEGIN
 		,@ObjectType		= [ObjectType]
 		,@ObjectTypeDesc	= [ObjectType]
 		,@SchemaName		= [SchemaName]
-	FROM #objects;
+	FROM #sp_dp_help_objects;
 END
 --#endregion
 
